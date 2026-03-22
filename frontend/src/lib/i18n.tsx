@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 
-type Lang = "he" | "en";
+export type Lang = "he" | "en";
 
 const translations = {
   he: {
@@ -71,25 +71,22 @@ const translations = {
 
 interface I18nContextType {
   lang: Lang;
-  setLang: (lang: Lang) => void;
   t: (typeof translations)["he"];
   isRTL: boolean;
 }
 
 const I18nContext = createContext<I18nContextType>({
-  lang: "he",
-  setLang: () => {},
-  t: translations.he,
-  isRTL: true,
+  lang: "en",
+  t: translations.en,
+  isRTL: false,
 });
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("he");
+export function I18nProvider({ lang, children }: { lang: Lang; children: ReactNode }) {
   const t = translations[lang];
   const isRTL = lang === "he";
 
   return (
-    <I18nContext.Provider value={{ lang, setLang, t, isRTL }}>
+    <I18nContext.Provider value={{ lang, t, isRTL }}>
       <div dir={isRTL ? "rtl" : "ltr"}>{children}</div>
     </I18nContext.Provider>
   );
@@ -97,4 +94,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
 export function useI18n() {
   return useContext(I18nContext);
+}
+
+export function isValidLang(lang: string): lang is Lang {
+  return lang === "he" || lang === "en";
 }
