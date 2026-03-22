@@ -70,7 +70,7 @@ export default function Home() {
       setLastRefresh(new Date());
       setError(null);
     } catch (err) {
-      setError("שגיאה בטעינת נתוני טיסות");
+      setError(t.errorLoading);
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -193,7 +193,7 @@ export default function Home() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex items-center justify-between glass-panel rounded-xl px-4 py-2.5 text-xs"
+        className="flex items-center justify-center gap-4 glass-panel rounded-xl px-4 py-2 text-xs max-w-md mx-auto"
       >
         <div className="flex items-center gap-2 text-gray-400">
           <Wifi className="w-3.5 h-3.5 text-green-400" />
