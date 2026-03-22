@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: ./backend
+    container_name: flight_dashboard_backend
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    networks:
+      - flight_net
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-/api}
+        - NEXT_PUBLIC_APP_TITLE=${NEXT_PUBLIC_APP_TITLE:-}
+    container_name: flight_dashboard_frontend
+    ports:
+      - "6943:3000"
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-/api}
+      - NEXT_PUBLIC_APP_TITLE=${NEXT_PUBLIC_APP_TITLE:-}
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - flight_net
+
+networks:
+  flight_net:
+    driver: bridge
