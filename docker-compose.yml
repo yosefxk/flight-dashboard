@@ -10,12 +10,11 @@ services:
     build:
       context: ./frontend
       args:
-        - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-/api}
         - NEXT_PUBLIC_APP_TITLE=${NEXT_PUBLIC_APP_TITLE:-}
     container_name: flight_dashboard_frontend
     environment:
-      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL:-/api}
       - NEXT_PUBLIC_APP_TITLE=${NEXT_PUBLIC_APP_TITLE:-}
+      - BACKEND_INTERNAL_URL=${BACKEND_INTERNAL_URL:-http://flight_dashboard_backend:8001}
     depends_on:
       - backend
     restart: unless-stopped

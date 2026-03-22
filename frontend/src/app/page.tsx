@@ -59,11 +59,9 @@ export default function Home() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8001";
-
   const fetchFlights = useCallback(async () => {
     try {
-      const res = await fetch(`${backendUrl}/api/flights`);
+      const res = await fetch("/api/flights");
       if (!res.ok) throw new Error("Failed to fetch");
       const json: FlightResponse = await res.json();
       setData(json);
@@ -76,7 +74,7 @@ export default function Home() {
       setIsLoading(false);
       setIsRefreshing(false);
     }
-  }, [backendUrl]);
+  }, [t]);
 
   // Initial load + auto-refresh every 5 minutes
   useEffect(() => {
@@ -88,7 +86,7 @@ export default function Home() {
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
     try {
-      await fetch(`${backendUrl}/api/flights/refresh`, { method: "POST" });
+      await fetch("/api/flights/refresh", { method: "POST" });
     } catch (e) {
       /* ignore, fetchFlights will handle errors */
     }
