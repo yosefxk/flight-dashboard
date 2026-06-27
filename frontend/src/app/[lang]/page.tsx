@@ -186,7 +186,7 @@ export default function Home() {
         </h1>
         <p className="text-sm text-gray-500">{t.subtitle}</p>
         <p className="text-[10px] md:text-xs font-semibold tracking-widest text-neutral-400 uppercase opacity-80 mt-2">
-          באירוח BaileyTV • Hosted on BaileyTV
+          {lang === "he" ? "באירוח BaileyTV" : "Hosted on BaileyTV"}
         </p>
       </motion.div>
 
