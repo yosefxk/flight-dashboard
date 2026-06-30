@@ -19,7 +19,17 @@ function FlagIcon({ country }: { country: "us" | "il" }) {
       <rect width="74" height="50" fill="#b22234"/>
       <path d="M0,3.8h74M0,11.5h74M0,19.2h74M0,26.9h74M0,34.6h74M0,42.3h74" stroke="white" strokeWidth="3.8"/>
       <rect width="32" height="27" fill="#3c3b6e"/>
-      <text x="16" y="20" fontSize="18" fill="white" textAnchor="middle" fontFamily="sans-serif">★</text>
+      <g fill="white" fontSize="5" fontFamily="sans-serif" textAnchor="middle">
+        <text x="6" y="9">★</text>
+        <text x="14" y="9">★</text>
+        <text x="22" y="9">★</text>
+        <text x="10" y="16">★</text>
+        <text x="18" y="16">★</text>
+        <text x="26" y="16">★</text>
+        <text x="6" y="23">★</text>
+        <text x="14" y="23">★</text>
+        <text x="22" y="23">★</text>
+      </g>
     </svg>
   );
 }
