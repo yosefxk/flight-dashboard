@@ -122,18 +122,26 @@ export default function Home() {
           cmp = (a.actual || "").localeCompare(b.actual || ""); break;
         case "airline":
           cmp = (a.airline_name || "").localeCompare(b.airline_name || ""); break;
-        case "city":
-          cmp = (a.city_he || "").localeCompare(b.city_he || ""); break;
+        case "city": {
+          const aCity = lang === "he" ? a.city_he : (a.city_en || a.city_short || a.city_he || "");
+          const bCity = lang === "he" ? b.city_he : (b.city_en || b.city_short || b.city_he || "");
+          cmp = (aCity || "").localeCompare(bCity || "");
+          break;
+        }
         case "flight":
           cmp = (a.flight_number || "").localeCompare(b.flight_number || ""); break;
-        case "status":
-          cmp = (a.status_en || "").localeCompare(b.status_en || ""); break;
+        case "status": {
+          const aStatus = lang === "he" ? a.status_he : a.status_en;
+          const bStatus = lang === "he" ? b.status_he : b.status_en;
+          cmp = (aStatus || "").localeCompare(bStatus || "");
+          break;
+        }
       }
       return sortAsc ? cmp : -cmp;
     });
 
     return flights;
-  }, [data, activeTab, selectedAirline, selectedCountry, flightSearch, sortBy, sortAsc]);
+  }, [data, activeTab, selectedAirline, selectedCountry, flightSearch, sortBy, sortAsc, lang]);
 
   // Derive unique airlines and countries for the filter dropdowns
   const { airlines, countries, arrivalCount, departureCount } = useMemo(() => {

@@ -18,6 +18,7 @@ def fetch_all_flights() -> dict:
     """
     all_records = []
     offset = 0
+    fetch_error = None
 
     while True:
         params = {
@@ -31,6 +32,7 @@ def fetch_all_flights() -> dict:
             data = resp.json()
         except Exception as e:
             print(f"[fetcher] Error fetching flights at offset {offset}: {e}")
+            fetch_error = e
             break
 
         result = data.get("result", {})
@@ -43,6 +45,9 @@ def fetch_all_flights() -> dict:
             break
 
         offset += PAGE_SIZE
+
+    if fetch_error and len(all_records) == 0:
+        raise RuntimeError(f"Failed to fetch flight records: {fetch_error}")
 
     return {
         "flights": all_records,

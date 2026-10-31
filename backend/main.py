@@ -8,6 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.background import BackgroundScheduler
 from typing import Optional
 import uvicorn
+import asyncio
+import time
+import os
 
 from fetcher import fetch_all_flights, parse_flight
 
@@ -31,17 +34,23 @@ flight_cache = {
 
 
 def refresh_flights():
-    """Fetch fresh data from the government API and update the cache."""
+    """Fetch fresh data from the government API and update the cache safely."""
     global flight_cache
     print("[scheduler] Refreshing flight data...")
-    raw = fetch_all_flights()
-    parsed = [parse_flight(r) for r in raw["flights"]]
-    flight_cache = {
-        "flights": parsed,
-        "total": len(parsed),
-        "fetched_at": raw["fetched_at"],
-    }
-    print(f"[scheduler] Cached {len(parsed)} flights at {raw['fetched_at']}")
+    try:
+        raw = fetch_all_flights()
+        if raw.get("flights"):
+            parsed = [parse_flight(r) for r in raw["flights"]]
+            flight_cache = {
+                "flights": parsed,
+                "total": len(parsed),
+                "fetched_at": raw["fetched_at"],
+            }
+            print(f"[scheduler] Cached {len(parsed)} flights at {raw['fetched_at']}")
+        else:
+            print("[scheduler] No flights received; preserving existing flight cache.")
+    except Exception as e:
+        print(f"[scheduler] Refresh failed: {e}; preserving existing flight cache.")
 
 
 # Background scheduler: refresh every 5 minutes
@@ -112,10 +121,21 @@ async def get_flights(
     }
 
 
+_last_refresh_time = 0.0
+
 @app.post("/api/flights/refresh")
 async def manual_refresh():
-    """Manually trigger a data refresh."""
-    refresh_flights()
+    """Manually trigger a data refresh without blocking the event loop."""
+    global _last_refresh_time
+    now = time.time()
+    if now - _last_refresh_time < 60 and flight_cache["fetched_at"] is not None:
+        return {
+            "message": "Rate limited. Refresh allowed once every 60s.",
+            "total": flight_cache["total"],
+            "fetched_at": flight_cache["fetched_at"],
+        }
+    _last_refresh_time = now
+    await asyncio.to_thread(refresh_flights)
     return {
         "message": "Refreshed successfully",
         "total": flight_cache["total"],
@@ -124,4 +144,5 @@ async def manual_refresh():
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    reload = os.getenv("UVICORN_RELOAD", "false").lower() in ("true", "1")
+    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=reload)
